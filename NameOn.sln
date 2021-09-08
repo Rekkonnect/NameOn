@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NameOn.Test", "NameOn\NameO
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NameOn.Core", "NameOn.Core\NameOn.Core.csproj", "{B601B70A-6782-4D2C-81CD-AD570CD2BC38}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NameOn.Core.Test", "NameOn.Core.Test\NameOn.Core.Test.csproj", "{A5A55264-15F3-4C25-9DA4-698CD3C6EEF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{B601B70A-6782-4D2C-81CD-AD570CD2BC38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B601B70A-6782-4D2C-81CD-AD570CD2BC38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B601B70A-6782-4D2C-81CD-AD570CD2BC38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5A55264-15F3-4C25-9DA4-698CD3C6EEF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5A55264-15F3-4C25-9DA4-698CD3C6EEF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5A55264-15F3-4C25-9DA4-698CD3C6EEF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5A55264-15F3-4C25-9DA4-698CD3C6EEF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

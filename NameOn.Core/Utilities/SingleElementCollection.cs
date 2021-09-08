@@ -4,9 +4,11 @@ using System.Collections.Generic;
 
 namespace NameOn.Core.Utilities
 {
-    public struct SingleElementCollection<T> : IEnumerable<T>
+    public struct SingleElementCollection<T> : IReadOnlyCollection<T>
     {
         private readonly T element;
+
+        public int Count => 1;
 
         public SingleElementCollection(T singleElement)
         {
@@ -18,12 +20,12 @@ namespace NameOn.Core.Utilities
 
         private struct SingleElementEnumerator : IEnumerator<T>
         {
-            private SingleElementCollection<T> collection;
+            private readonly SingleElementCollection<T> instance;
             private EnumerationState state;
 
             public SingleElementEnumerator(SingleElementCollection<T> collection)
             {
-                this.collection = collection;
+                instance = collection;
                 state = EnumerationState.Before;
             }
 
@@ -32,12 +34,12 @@ namespace NameOn.Core.Utilities
                 get
                 {
                     if (state is EnumerationState.After)
-                        throw new InvalidOperationException("The single element has already been enuemrated.");
+                        throw new InvalidOperationException("The single element has already been enumerated.");
 
                     if (state is EnumerationState.Before)
                         throw new InvalidOperationException("The enumeration has not yet begun.");
 
-                    return collection.element;
+                    return instance.element;
                 }
             }
             object IEnumerator.Current => Current;
@@ -48,7 +50,7 @@ namespace NameOn.Core.Utilities
                     return false;
 
                 state++;
-                return state < EnumerationState.Current;
+                return state < EnumerationState.After;
             }
             public void Reset()
             {
