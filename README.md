@@ -1,6 +1,9 @@
 # NameOn
 A Roslyn analyzer providing the ability to control usage of nameof
 
+## Disclaimer
+The project is still in its early development stage. Some desired features are not yet implemented, bugs may exist, etc.
+
 ## References
 - [Usage](docs/usage.md)
 - [Diagnostics](docs/index.md)
