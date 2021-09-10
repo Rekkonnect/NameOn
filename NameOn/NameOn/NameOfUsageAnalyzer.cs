@@ -7,7 +7,9 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 using NameOn.Core;
 using NameOn.Core.Utilities;
+using RoseLynn;
 using RoseLynn.Analyzers;
+using RoseLynn.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -46,6 +48,12 @@ namespace NameOn
                 SyntaxKind.SimpleAssignmentExpression,
             };
 
+            // Returning in a function is the equivalent of assigning the final value
+            var returnKinds = new SyntaxKind[]
+            {
+                SyntaxKind.ReturnStatement,
+            };
+
             // Invoking a method that requires an argument be passed 
             var invocationKinds = new SyntaxKind[]
             {
@@ -69,13 +77,23 @@ namespace NameOn
             };
 
             // Fields and properties could also restrict nameof usage
-            var memberVariableDeclarationKinds = new SyntaxKind[]
+            var attributableDeclarationKinds = new SyntaxKind[]
             {
                 SyntaxKind.FieldDeclaration,
                 SyntaxKind.PropertyDeclaration,
             };
 
             context.RegisterSyntaxNodeAction(AnalyzeAssignment, assignmentKinds);
+            context.RegisterSyntaxNodeAction(AnalyzeReturnAssignment, returnKinds);
+        }
+
+        private void AnalyzeReturnAssignment(SyntaxNodeAnalysisContext context)
+        {
+            var returnStatementNode = context.Node as ReturnStatementSyntax;
+            var declaration = returnStatementNode!.GetNearestParentOfType<BaseMethodDeclarationSyntax>();
+            var declarationSymbol = context.SemanticModel.GetDeclaredSymbol(declaration)!;
+            AnalyzeFunctionRestrictions(context, declarationSymbol);
+            EvaluateExpressionSubstitution(context, declarationSymbol, returnStatementNode!.Expression!);
         }
 
         private void AnalyzeAssignment(SyntaxNodeAnalysisContext context)
@@ -84,13 +102,18 @@ namespace NameOn
             var left = assignmentNode!.Left;
             var right = assignmentNode.Right;
 
-            AnalyzeSimpleAssignment(context, left, right);
+            var operation = context.SemanticModel.GetOperation(assignmentNode);
+            if (operation!.Kind is OperationKind.DeconstructionAssignment)
+            {
+                // in the case of tuples, analyze
+            }
+            else
+            {
+                AnalyzeSimpleAssignment(context, left, right);
+            }
         }
-
         private void AnalyzeSimpleAssignment(SyntaxNodeAnalysisContext context, ExpressionSyntax left, ExpressionSyntax right)
         {
-            var semanticModel = context.SemanticModel;
-
             // TODO: Evaluate case
             /*
              * // Assume definition
@@ -100,19 +123,27 @@ namespace NameOn
              * var s = Function(nameof(Function), "F");
              */
 
+            var semanticModel = context.SemanticModel;
+            var substitutedSymbol = semanticModel.GetSymbolInfo(left, context.CancellationToken).Symbol!;
+            AnalyzeRestrictions(context, substitutedSymbol);
+            EvaluateExpressionSubstitution(context, substitutedSymbol, right);
+        }
+
+        private void EvaluateExpressionSubstitution(SyntaxNodeAnalysisContext context, ISymbol substitutedSymbol, ExpressionSyntax substitutingExpression)
+        {
+            var semanticModel = context.SemanticModel;
+
             // First ensure that the assigned expression is of type string, otherwise we don't care
-            var rightHandExpressionType = semanticModel.GetTypeInfo(right);
-            if (!rightHandExpressionType.MatchesExplicitlyOrImplicitly(SpecialType.System_String))
+            var substitutingExpressionType = semanticModel.GetTypeInfo(substitutingExpression);
+            if (!substitutingExpressionType.MatchesExplicitlyOrImplicitly(SpecialType.System_String))
                 return;
 
             // Now analyze the nameof state of the assigned expression
-            var leftHandExpressionSymbol = semanticModel.GetSymbolInfo(left, context.CancellationToken).Symbol;
-            var state = GetNameOfExpressionState(right, semanticModel, out var nameofOperations);
-            symbolStateDictionary.Register(leftHandExpressionSymbol, state);
-            
+            var state = GetNameOfExpressionState(substitutingExpression, semanticModel, out var nameofOperations);
+            symbolStateDictionary.Register(substitutedSymbol, state);
+
             // Then evaluate whether the nameof state matches that of the assigned symbol's restrictions
-            AnalyzeRestrictions(context, leftHandExpressionSymbol!);
-            var symbolRestrictionDictionary = restrictionDictionary[leftHandExpressionSymbol];
+            var symbolRestrictionDictionary = restrictionDictionary[substitutedSymbol];
 
             foreach (var nameofOperation in nameofOperations)
             {
@@ -125,14 +156,14 @@ namespace NameOn
                 EvaluateDiagnosticReport(restrictions, namedOperationNode, symbolKind);
             }
 
-            EvaluateDiagnosticReport(symbolRestrictionDictionary.RestrictionForAllKinds, right, NamedSymbolKind.All);
+            EvaluateDiagnosticReport(symbolRestrictionDictionary.RestrictionForAllKinds, substitutingExpression, NamedSymbolKind.All);
 
             void EvaluateDiagnosticReport(NameOfRestrictions restrictions, SyntaxNode node, NamedSymbolKind symbolKinds)
             {
                 if (!state.ValidForRestrictions(restrictions))
                 {
                     var diagnosticCreator = GetDiagnosticCreator(restrictions);
-                    context.ReportDiagnostic(diagnosticCreator?.Invoke(node, leftHandExpressionSymbol, symbolKinds));
+                    context.ReportDiagnostic(diagnosticCreator?.Invoke(node, substitutedSymbol, symbolKinds));
                 }
             }
         }
@@ -151,9 +182,35 @@ namespace NameOn
             if (restrictionDictionary.ContainsKey(symbol))
                 return;
 
+            RegisterRestrictions(symbol);
+        }
+        private void AnalyzeFunctionRestrictions(SyntaxNodeAnalysisContext context, BaseMethodDeclarationSyntax declaration)
+        {
+            var methodSymbol = context.SemanticModel.GetDeclaredSymbol(declaration)!;
+            AnalyzeFunctionRestrictions(context, methodSymbol);
+        }
+        private void AnalyzeFunctionRestrictions(SyntaxNodeAnalysisContext context, IMethodSymbol methodSymbol)
+        {
+            if (restrictionDictionary.ContainsKey(methodSymbol))
+                return;
+
+            var attributes = methodSymbol.GetReturnTypeAttributes();
+            var restrictions = GetRestrictionAssociation(attributes);
+            restrictionDictionary.Register(methodSymbol, restrictions);
+        }
+
+        private void RegisterRestrictions(ISymbol symbol)
+        {
+            restrictionDictionary.Register(symbol, GetRestrictionAssociation(symbol));
+        }
+        private static NameOfRestrictionAssociation GetRestrictionAssociation(ISymbol symbol)
+        {
+            return GetRestrictionAssociation(symbol.GetAttributes());
+        }
+        private static NameOfRestrictionAssociation GetRestrictionAssociation(IEnumerable<AttributeData> attributes)
+        {
             var restrictions = new NameOfRestrictionAssociation();
 
-            var attributes = symbol.GetAttributes();
             foreach (var attribute in attributes)
             {
                 var restriction = GetRestriction(attribute);
@@ -163,7 +220,7 @@ namespace NameOn
                 restrictions.AddKinds(NameOfRestrictionAttributeBase.GetConstructorRestrictions(attribute), restriction.Value);
             }
 
-            restrictionDictionary.Register(symbol, restrictions);
+            return restrictions;
         }
 
         private static NameOfState GetNameOfExpressionState(ExpressionSyntax expression, SemanticModel model, out IEnumerable<INameOfOperation> nameofOperations)

@@ -1,35 +1,37 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace NameOn.Core.Utilities
 {
-    public struct SingleElementCollection<T> : IReadOnlyCollection<T>
+    public struct SingleElementCollection<T> : IReadOnlyCollection<T?>
     {
-        private readonly T element;
+        private readonly T? element;
 
         public int Count => 1;
 
-        public SingleElementCollection(T singleElement)
+        public SingleElementCollection(T? singleElement)
         {
             element = singleElement;
         }
 
-        public IEnumerator<T> GetEnumerator() => new SingleElementEnumerator(this);
+        public IEnumerator<T?> GetEnumerator() => new SingleElementEnumerator(this);
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        private struct SingleElementEnumerator : IEnumerator<T>
+        private struct SingleElementEnumerator : IEnumerator<T?>
         {
-            private readonly SingleElementCollection<T> instance;
+            private readonly SingleElementCollection<T?> instance;
             private EnumerationState state;
 
-            public SingleElementEnumerator(SingleElementCollection<T> collection)
+            public SingleElementEnumerator(SingleElementCollection<T?> collection)
             {
                 instance = collection;
                 state = EnumerationState.Before;
             }
 
-            public T Current
+            public T? Current
             {
                 get
                 {
@@ -42,7 +44,7 @@ namespace NameOn.Core.Utilities
                     return instance.element;
                 }
             }
-            object IEnumerator.Current => Current;
+            object? IEnumerator.Current => Current;
 
             public bool MoveNext()
             {
