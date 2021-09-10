@@ -5,8 +5,8 @@
     <LangVersion>9.0</LangVersion>
     
     <PackageId>NameOn.Core</PackageId>
-    <PackageVersion>0.1.0</PackageVersion>
-    <Version>0.1.0</Version>
+    <PackageVersion>0.1.1</PackageVersion>
+    <Version>0.1.1</Version>
     <Authors>Alex Kalfakakos</Authors>
     <RepositoryUrl>https://github.com/AlFasGD/NameOn</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
