@@ -10,5 +10,8 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v1
 
-    - name: Run Tests
+    - name: Run NameOn Tests
+      run: dotnet test NameOn/NameOn.Test/NameOn.Test.csproj
+
+    - name: Run NameOn.Core Tests
       run: dotnet test NameOn.Core.Test/NameOn.Core.Test.csproj
