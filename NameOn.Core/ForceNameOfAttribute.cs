@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RoseLynn;
+using System;
 
 namespace NameOn.Core
 {
@@ -10,7 +11,7 @@ namespace NameOn.Core
 
         public ForceNameOfAttribute()
             : base() { }
-        public ForceNameOfAttribute(NamedSymbolKind affectedSymbolKinds)
+        public ForceNameOfAttribute(IdentifiableSymbolKind affectedSymbolKinds)
             : base(affectedSymbolKinds) { }
     }
 }

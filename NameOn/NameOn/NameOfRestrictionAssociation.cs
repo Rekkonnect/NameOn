@@ -1,10 +1,11 @@
 ﻿using NameOn.Core;
+using RoseLynn;
 using RoseLynn.Utilities;
 using System.Collections.Generic;
 
 namespace NameOn
 {
-    using static NamedSymbolKind;
+    using static IdentifiableSymbolKind;
 
     public class NameOfRestrictionAssociation
     {
@@ -12,17 +13,17 @@ namespace NameOn
 
         public NameOfRestrictions RestrictionForAllKinds => this[All];
 
-        public void AddKinds(NamedSymbolKind appliedKinds, NameOfRestrictions restrictions)
+        public void AddKinds(IdentifiableSymbolKind appliedKinds, NameOfRestrictions restrictions)
         {
             dictionary.AddKinds(appliedKinds, restrictions);
         }
 
-        public NameOfRestrictions this[NamedSymbolKind distinctKind] => dictionary.ValueOrDefault(distinctKind);
+        public NameOfRestrictions this[IdentifiableSymbolKind distinctKind] => dictionary.ValueOrDefault(distinctKind);
 
-        private sealed class RestrictionsDictionary : Dictionary<NamedSymbolKind, NameOfRestrictions>
+        private sealed class RestrictionsDictionary : Dictionary<IdentifiableSymbolKind, NameOfRestrictions>
         {
             // Not overengineering this today
-            public static readonly NamedSymbolKind[] DistinctKinds =
+            public static readonly IdentifiableSymbolKind[] DistinctKinds =
             {
                 Namespace,
 
@@ -46,7 +47,7 @@ namespace NameOn
                 Event,
                 Method,
             };
-            private static readonly NamedSymbolKind[] globalFlags =
+            private static readonly IdentifiableSymbolKind[] globalFlags =
             {
                 None,
                 Alias,
@@ -72,7 +73,7 @@ namespace NameOn
             public RestrictionsDictionary()
                 : base(template) { }
 
-            public void AddKinds(NamedSymbolKind appliedKinds, NameOfRestrictions restrictions)
+            public void AddKinds(IdentifiableSymbolKind appliedKinds, NameOfRestrictions restrictions)
             {
                 foreach (var distinct in Keys)
                 {
