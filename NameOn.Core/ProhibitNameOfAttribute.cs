@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RoseLynn;
+using System;
 
 namespace NameOn.Core
 {
@@ -9,7 +10,7 @@ namespace NameOn.Core
 
         public ProhibitNameOfAttribute()
             : base() { }
-        public ProhibitNameOfAttribute(NamedSymbolKind affectedSymbolKinds)
+        public ProhibitNameOfAttribute(IdentifiableSymbolKind affectedSymbolKinds)
             : base(affectedSymbolKinds) { }
     }
 }

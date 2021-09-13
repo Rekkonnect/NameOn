@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using RoseLynn;
 using RoseLynn.Utilities;
 using System;
 
@@ -14,7 +15,7 @@ namespace NameOn.Core
         {
             protected override object[] GetDefaultInstanceArguments()
             {
-                return new object[] { NamedSymbolKind.All };
+                return new object[] { IdentifiableSymbolKind.All };
             }
         }
 
@@ -22,11 +23,11 @@ namespace NameOn.Core
         public abstract NameOfRestrictions Restrictions { get; }
 
         /// <summary>Determines the symbol kinds that the restriction is applied for.</summary>
-        public NamedSymbolKind AffectedSymbolKinds { get; }
+        public IdentifiableSymbolKind AffectedSymbolKinds { get; }
 
         protected NameOfRestrictionAttributeBase()
-            : this(NamedSymbolKind.All) { }
-        protected NameOfRestrictionAttributeBase(NamedSymbolKind affectedSymbolKinds)
+            : this(IdentifiableSymbolKind.All) { }
+        protected NameOfRestrictionAttributeBase(IdentifiableSymbolKind affectedSymbolKinds)
         {
             AffectedSymbolKinds = affectedSymbolKinds;
         }
@@ -48,13 +49,13 @@ namespace NameOn.Core
             return instanceContainer.GetDefaultInstance(type)?.Restrictions;
         }
 
-        public static NamedSymbolKind GetConstructorRestrictions(AttributeData attribute)
+        public static IdentifiableSymbolKind GetConstructorRestrictions(AttributeData attribute)
         {
             var args = attribute.ConstructorArguments;
             if (args.IsEmpty)
-                return NamedSymbolKind.All;
+                return IdentifiableSymbolKind.All;
 
-            return (NamedSymbolKind)attribute.ConstructorArguments[0].Value;
+            return (IdentifiableSymbolKind)attribute.ConstructorArguments[0].Value;
         }
     }
 }

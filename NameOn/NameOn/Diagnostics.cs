@@ -1,24 +1,25 @@
 ﻿using Microsoft.CodeAnalysis;
 using NameOn.Core;
+using RoseLynn;
 using static NameOn.NAMEDiagnosticDescriptorStorage;
 
 namespace NameOn
 {
     internal static class Diagnostics
     {
-        public static Diagnostic CreateNAME0001(SyntaxNode node, ISymbol assignedSymbol, NamedSymbolKind symbolKind)
+        public static Diagnostic CreateNAME0001(SyntaxNode node, ISymbol assignedSymbol, IdentifiableSymbolKind symbolKind)
         {
             return CreateInvalidNameOfAssignment(0001, node, assignedSymbol, symbolKind);
         }
-        public static Diagnostic CreateNAME0002(SyntaxNode node, ISymbol assignedSymbol, NamedSymbolKind symbolKind)
+        public static Diagnostic CreateNAME0002(SyntaxNode node, ISymbol assignedSymbol, IdentifiableSymbolKind symbolKind)
         {
             return CreateInvalidNameOfAssignment(0002, node, assignedSymbol, symbolKind);
         }
-        public static Diagnostic CreateNAME0003(SyntaxNode node, ISymbol assignedSymbol, NamedSymbolKind symbolKind)
+        public static Diagnostic CreateNAME0003(SyntaxNode node, ISymbol assignedSymbol, IdentifiableSymbolKind symbolKind)
         {
             return CreateInvalidNameOfAssignment(0003, node, assignedSymbol, symbolKind);
         }
-        public static Diagnostic CreateNAME0004(SyntaxNode node, ISymbol assignedSymbol, NamedSymbolKind symbolKind)
+        public static Diagnostic CreateNAME0004(SyntaxNode node, ISymbol assignedSymbol, IdentifiableSymbolKind symbolKind)
         {
             return CreateInvalidNameOfAssignment(0004, node, assignedSymbol, symbolKind);
         }
@@ -28,11 +29,11 @@ namespace NameOn
             return CreateInvalidNameOfAssignment(0010, node, assignedSymbol, default);
         }
 
-        private static Diagnostic CreateInvalidNameOfAssignment(int id, SyntaxNode node, ISymbol assignedSymbol, NamedSymbolKind symbolKind)
+        private static Diagnostic CreateInvalidNameOfAssignment(int id, SyntaxNode node, ISymbol assignedSymbol, IdentifiableSymbolKind symbolKind)
         {
             return Diagnostic.Create(Instance[id], node?.GetLocation(), assignedSymbol.ToDisplayString(), symbolKind);
         }
 
-        public delegate Diagnostic InvalidNameOfAssignmentDiagnosticCreator(SyntaxNode node, ISymbol assignedSymbol, NamedSymbolKind symbolKind);
+        public delegate Diagnostic InvalidNameOfAssignmentDiagnosticCreator(SyntaxNode node, ISymbol assignedSymbol, IdentifiableSymbolKind symbolKind);
     }
 }

@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
-    <PackageReference Include="RoseLynn.CodeFixes" Version="0.3.3" />
+    <PackageReference Include="RoseLynn.CodeFixes" Version="0.3.5" />
   </ItemGroup>
 
   <ItemGroup>

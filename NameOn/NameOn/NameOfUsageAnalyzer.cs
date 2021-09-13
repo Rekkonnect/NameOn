@@ -10,6 +10,7 @@ using NameOn.Core.Utilities;
 using RoseLynn;
 using RoseLynn.Analyzers;
 using RoseLynn.CSharp.Syntax;
+using RoseLynn.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -149,16 +150,16 @@ namespace NameOn
             {
                 var namedOperationNode = nameofOperation.Argument.Syntax;
                 var alias = semanticModel.GetAliasOrSymbolInfo(namedOperationNode, context.CancellationToken);
-                var symbolKind = alias.GetNamedSymbolKind();
+                var symbolKind = alias.GetIdentifiableSymbolKind();
 
                 var restrictions = symbolRestrictionDictionary[symbolKind];
 
                 EvaluateDiagnosticReport(restrictions, namedOperationNode, symbolKind);
             }
 
-            EvaluateDiagnosticReport(symbolRestrictionDictionary.RestrictionForAllKinds, substitutingExpression, NamedSymbolKind.All);
+            EvaluateDiagnosticReport(symbolRestrictionDictionary.RestrictionForAllKinds, substitutingExpression, IdentifiableSymbolKind.All);
 
-            void EvaluateDiagnosticReport(NameOfRestrictions restrictions, SyntaxNode node, NamedSymbolKind symbolKinds)
+            void EvaluateDiagnosticReport(NameOfRestrictions restrictions, SyntaxNode node, IdentifiableSymbolKind symbolKinds)
             {
                 if (!state.ValidForRestrictions(restrictions))
                 {
