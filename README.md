@@ -1,6 +1,12 @@
 # NameOn
 A Roslyn analyzer providing the ability to control usage of nameof
 
+# IMPORTANT
+
+The project has been ported over under the umbrella of RossLean: [Link](https://github.com/RossLean/RossLean/tree/master/RossLean.NameOn)
+
+This repository will remain as a public archive, but development will continue over at RossLean.
+
 ## Disclaimer
 The project is still in its early development stage. Some desired features are not yet implemented, bugs may exist, etc.
 
